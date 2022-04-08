@@ -10,7 +10,7 @@
   "modes": {
     "standard": {
       "connectTimeoutInMillis": {
-        "override": 3100
+        "override": 2000
       },
       "tlsNegotiationTimeoutInMillis": {
         "override": 3100

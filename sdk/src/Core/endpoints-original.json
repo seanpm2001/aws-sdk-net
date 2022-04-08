@@ -2,7 +2,7 @@
   "partitions" : [ {
     "defaults" : {
       "hostname" : "{service}.{region}.{dnsSuffix}",
-      "protocols" : [ "https" ],
+      "protocols" : [ "https", "http" ],
       "signatureVersions" : [ "v4" ],
       "variants" : [ {
         "dnsSuffix" : "amazonaws.com",
