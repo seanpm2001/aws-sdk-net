@@ -122,6 +122,52 @@ namespace Amazon.DynamoDBv2.DataModel
 
         #endregion
 
+        /// <summary>
+        /// Adds a <see cref="Table"/> to this context's internal cache, which
+        /// will avoid an internal <see cref="IAmazonDynamoDB.DescribeTable(string)"/>
+        /// call to populate the cache
+        /// </summary>
+        /// <param name="table">Table</param>
+        public void RegisterTableDefinition(Table table)
+        {
+            try
+            {
+                _readerWriterLockSlim.EnterReadLock();
+
+                if (tablesMap.ContainsKey(table.TableName))
+                {
+                    return;
+                }
+            }
+            finally
+            {
+                if (_readerWriterLockSlim.IsReadLockHeld)
+                {
+                    _readerWriterLockSlim.ExitReadLock();
+                }
+            }
+
+            try
+            {
+                _readerWriterLockSlim.EnterWriteLock();
+
+                // Check to see if another thread go the write lock before this thread and filled the cache.
+                if (tablesMap.ContainsKey(table.TableName))
+                {
+                    return;
+                }
+
+                tablesMap[table.TableName] = table;
+            }
+            finally
+            {
+                if (_readerWriterLockSlim.IsWriteLockHeld)
+                {
+                    _readerWriterLockSlim.ExitWriteLock();
+                }
+            }
+        }
+
         #region Dispose Pattern Implementation
 
         /// <summary>

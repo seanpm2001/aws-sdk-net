@@ -18,6 +18,30 @@ namespace AWSSDK_DotNet.IntegrationTests.Tests.DynamoDB
     {
         [TestMethod]
         [TestCategory("DynamoDBv2")]
+        public void TestWithStaticTable()
+        {
+            var config = new DynamoDBContextConfig
+            {
+                //IgnoreNullValues = true
+                IsEmptyStringValueEnabled = true,
+                Conversion = DynamoDBEntryConversion.V2
+            };
+            Context = new DynamoDBContext(Client, config);
+
+            var employeeTable = new TableBuilder(Client, "DotNetTests-HashRangeTable")
+                    .AddHashKey("Name", DynamoDBEntryType.String)
+                    .AddRangeKey("Age", DynamoDBEntryType.Numeric)
+                    .AddGlobalSecondaryIndex("GlobalIndex", "Company", DynamoDBEntryType.String, "Score", DynamoDBEntryType.Numeric)
+                    .AddLocalSecondaryIndex("LocalIndex", "Manager", DynamoDBEntryType.String)
+                    .Build();
+
+            Context.RegisterTableDefinition(employeeTable);
+
+            TestHashRangeObjects();
+
+        }
+        [TestMethod]
+        [TestCategory("DynamoDBv2")]
         public void TestContextWithEmptyStringEnabled()
         {
             // It is a known bug that this test currently fails due to an AOT-compilation
